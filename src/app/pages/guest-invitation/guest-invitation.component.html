@@ -1,0 +1,572 @@
+<div class="wedding-page" *ngIf="wedding">
+  <!-- Petals Background Animation -->
+  <div id="petals-container" class="petals-container"></div>
+
+  <!-- Music Floating Button -->
+  <button class="music-floating-btn" (click)="toggleMusic()" [class.playing]="isPlayingMusic" title="Bật/Tắt nhạc nền">
+    <i class="fa-solid" [class.fa-music]="isPlayingMusic" [class.fa-volume-xmark]="!isPlayingMusic"></i>
+    <span class="music-tooltip">{{ isPlayingMusic ? 'Tắt nhạc' : 'Phát nhạc' }}</span>
+  </button>
+
+  <!-- Copied Toast -->
+  <div class="toast-notification" *ngIf="copiedText">
+    <i class="fa-solid fa-circle-check"></i> {{ copiedText }}
+  </div>
+
+  <!-- HERO SECTION -->
+  <header class="hero-section" [style.backgroundImage]="'linear-gradient(rgba(15,15,26,0.65), rgba(15,15,26,0.85)), url(' + (wedding.coverImageUrl || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1920&q=80') + ')'">
+    <div class="hero-content">
+      <div class="hero-ornament">
+        <span class="line"></span>
+        <i class="fa-solid fa-heart-pulse heart-icon"></i>
+        <span class="line"></span>
+      </div>
+      
+      <p class="hero-subtitle">SAVE OUR DATE • THIỆP MỜI THÀNH HÔN</p>
+      
+      <h1 class="couple-hero-title">
+        <span class="groom-name">{{ wedding.groomName }}</span>
+        <span class="ampersand">&</span>
+        <span class="bride-name">{{ wedding.brideName }}</span>
+      </h1>
+
+      <p class="hero-date">
+        <i class="fa-regular fa-calendar-check"></i> {{ wedding.weddingDate | date:'EEEE, dd/MM/yyyy' : '' : 'vi-VN' }}
+      </p>
+
+      <!-- Personal Greeting Badge -->
+      <div class="guest-personal-card" *ngIf="invitationData?.guest">
+        <span class="guest-tag"><i class="fa-solid fa-envelope-open-text"></i> THIỆP MỜI TRÂN TRỌNG TỚI:</span>
+        <h3 class="guest-name">{{ invitationData.guest.fullName }}</h3>
+        <p class="guest-seats" *ngIf="invitationData.numberOfSeats">
+          Số lượng chỗ dành riêng: <strong>{{ invitationData.numberOfSeats }} Khách</strong>
+        </p>
+        <p class="guest-note" *ngIf="invitationData.personalMessage">
+          <em>"{{ invitationData.personalMessage }}"</em>
+        </p>
+      </div>
+
+      <!-- COUNTDOWN TIMER -->
+      <div class="countdown-wrapper">
+        <div class="countdown-box">
+          <span class="countdown-num">{{ countdown.days }}</span>
+          <span class="countdown-label">Ngày</span>
+        </div>
+        <span class="colon">:</span>
+        <div class="countdown-box">
+          <span class="countdown-num">{{ countdown.hours }}</span>
+          <span class="countdown-label">Giờ</span>
+        </div>
+        <span class="colon">:</span>
+        <div class="countdown-box">
+          <span class="countdown-num">{{ countdown.minutes }}</span>
+          <span class="countdown-label">Phút</span>
+        </div>
+        <span class="colon">:</span>
+        <div class="countdown-box">
+          <span class="countdown-num">{{ countdown.seconds }}</span>
+          <span class="countdown-label">Giây</span>
+        </div>
+      </div>
+
+      <!-- Button Xác nhận tham gia với hiệu ứng lướt mượt cinema xuống RSVP -->
+      <a href="#rsvp" class="btn-primary-gold hero-rsvp-btn" (click)="smoothSlideToRsvp($event)">
+        <i class="fa-solid fa-pen-fancy"></i> Xác Nhận Tham Dự Ngay
+      </a>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- 1. COUPLE INTRO SECTION -->
+    <section class="section couple-section m-slide-up">
+      <div class="section-header">
+        <p class="section-sub">GIỚI THIỆU</p>
+        <h2 class="section-title">Cô Dâu & Chú Rể</h2>
+        <div class="gold-divider">♦</div>
+      </div>
+
+      <div class="couple-cards-grid">
+        <!-- Groom Card -->
+        <div class="couple-card m-slide-up">
+          <div class="avatar-frame">
+            <img [src]="wedding.groomAvatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'" alt="Chú Rể" class="avatar-img">
+            <span class="role-badge">CHÚ RỂ</span>
+          </div>
+          <h3 class="person-name">{{ wedding.groomName }}</h3>
+          <p class="person-desc">
+            "Từ khoảnh khắc đầu tiên nhìn thấy em, anh đã biết em chính là mảnh ghép định mệnh mà anh luôn tìm kiếm."
+          </p>
+        </div>
+
+        <div class="heart-center">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+
+        <!-- Bride Card -->
+        <div class="couple-card m-slide-up">
+          <div class="avatar-frame">
+            <img [src]="wedding.brideAvatar || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'" alt="Cô Dâu" class="avatar-img">
+            <span class="role-badge">CÔ DÂU</span>
+          </div>
+          <h3 class="person-name">{{ wedding.brideName }}</h3>
+          <p class="person-desc">
+            "Cảm ơn anh đã luôn ở bên, che chở và cùng em bước tiếp trên chặng đường đời đầy yêu thương phía trước."
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. EVENTS & SCHEDULE (NÚT CHỈ ĐƯỜNG VÀ THÊM LỊCH BO TRÒN THEO USER REQUEST) -->
+    <section class="section events-section m-slide-up">
+      <div class="section-header">
+        <p class="section-sub">LỊCH TRÌNH</p>
+        <h2 class="section-title">Sự Kiện Cưới</h2>
+        <div class="gold-divider">♦</div>
+      </div>
+
+      <div class="events-grid">
+        <div class="event-card m-slide-up" *ngFor="let ev of wedding.events">
+          <div class="event-badge">{{ ev.eventType === 'Ceremony' ? 'LỄ GIA TIÊN' : 'TIỆC CƯỚI CHÍNH' }}</div>
+          <h3 class="event-name">{{ ev.eventName }}</h3>
+          
+          <div class="event-info-item">
+            <i class="fa-regular fa-clock"></i>
+            <span>{{ ev.startTime | date:'HH:mm - dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="event-info-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span><strong>{{ ev.location }}</strong></span>
+          </div>
+
+          <p class="event-desc" *ngIf="ev.description">{{ ev.description }}</p>
+
+          <!-- Action buttons bo khung tròn đồng bộ với button xác nhận tham gia -->
+          <div class="event-action-buttons">
+            <a [href]="'https://maps.google.com/?q=' + ev.location" target="_blank" class="event-map-btn pill-btn">
+              <i class="fa-solid fa-map-location-dot"></i> Xem Chỉ Đường
+            </a>
+            <a href="#rsvp" class="event-cal-btn pill-btn" (click)="smoothSlideToRsvp($event)">
+              <i class="fa-regular fa-calendar-check"></i> Xác Nhận Có Mặt
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. LOVE STORY TIMELINE -->
+    <section class="section story-section m-slide-up" *ngIf="wedding.stories?.length">
+      <div class="section-header">
+        <p class="section-sub">CHUYỆN TÌNH YÊU</p>
+        <h2 class="section-title">Hành Trình Hạnh Phúc</h2>
+        <div class="gold-divider">♦</div>
+      </div>
+
+      <div class="timeline-container">
+        <div class="timeline-item m-slide-up" *ngFor="let s of wedding.stories; let odd = odd" [class.reversed]="odd">
+          <div class="timeline-dot"></div>
+          <div class="timeline-card">
+            <span class="timeline-date">{{ s.eventDate | date:'MM/yyyy' }}</span>
+            <h4 class="timeline-title">{{ s.title }}</h4>
+            <p class="timeline-content">{{ s.content }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. WEDDING ALBUM SECTION (CHUẨN M-INVITE: 6 ẢNH TEASER + QUOTE + ẢNH CHÂN DUNG HOA PEONY + PRO LIGHTBOX) -->
+    <section class="section gallery-section m-slide-up" id="weddingAlbumSec">
+      <div class="section-header">
+        <p class="section-sub">KỶ NIỆM NGỌT NGÀO</p>
+        <h2 class="section-title">Album Ảnh Cưới</h2>
+        <div class="gold-divider">♦</div>
+        <p class="album-subtext">Khoảnh khắc tình yêu được ghi lại trọn vẹn từng phút giây</p>
+      </div>
+
+      <div class="album-container">
+        <!-- 6 ảnh đầu tiên dạng lưới đối xứng (Collage Teaser) -->
+        <div class="album-curated-grid">
+          <div class="album-photo-card m-slide-up" *ngFor="let photoUrl of photoList.slice(0, 6); let i = index" (click)="openPhotoModalByIndex(i)">
+            <img [src]="photoUrl" [alt]="'Ảnh cưới ' + (i + 1)" loading="lazy">
+          </div>
+        </div>
+
+        <!-- Khối 10 ảnh mở rộng xem thêm -->
+        <div class="album-expanded-wrap" [class.expanded]="isAlbumExpanded" *ngIf="photoList.length > 6">
+          <div class="album-curated-grid" style="margin-top: 14px;">
+            <div class="album-photo-card" *ngFor="let photoUrl of photoList.slice(6); let j = index" (click)="openPhotoModalByIndex(j + 6)">
+              <img [src]="photoUrl" [alt]="'Ảnh cưới ' + (j + 7)" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <!-- Nút Xem Thêm / Thu Gọn Album ảnh -->
+        <div class="album-more-btn-wrap m-slide-up" *ngIf="photoList.length > 6">
+          <button type="button" class="btn-album-more" (click)="toggleMorePhotos()">
+            <span>{{ isAlbumExpanded ? 'Thu gọn album' : 'Xem thêm (' + (photoList.length - 6) + ' ảnh)' }}</span>
+            <i class="fa-solid" [class.fa-chevron-down]="!isAlbumExpanded" [class.fa-chevron-up]="isAlbumExpanded"></i>
+          </button>
+        </div>
+
+        <!-- Câu trích dẫn lãng mạn M-Invite -->
+        <div class="album-quote-block m-slide-up">
+          <h3 class="album-quote-text">"Together is our favorite place."</h3>
+        </div>
+
+        <!-- Ảnh chân dung lớn nổi bật kèm họa tiết Hoa Mẫu Đơn phủ góc -->
+        <div class="album-hero-wrap m-slide-up">
+          <svg class="peony-flower-decor" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="peonyGradClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff8f0" />
+                <stop offset="50%" stop-color="#eddac7" />
+                <stop offset="100%" stop-color="#d6bca2" />
+              </linearGradient>
+              <linearGradient id="leafGradClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#8ba888" />
+                <stop offset="100%" stop-color="#55755b" />
+              </linearGradient>
+            </defs>
+            <path d="M40 140 C20 100 35 60 75 40 C70 70 85 100 120 120 C80 135 60 138 40 140 Z" fill="url(#leafGradClient)" opacity="0.85"/>
+            <ellipse cx="105" cy="65" rx="42" ry="34" fill="url(#peonyGradClient)" opacity="0.95"/>
+            <ellipse cx="85" cy="50" rx="35" ry="30" fill="#fdfbf7" stroke="#e0cbb4" stroke-width="1.5"/>
+            <ellipse cx="120" cy="58" rx="32" ry="28" fill="#f9f3ea" stroke="#dbc3ab" stroke-width="1.5"/>
+            <ellipse cx="102" cy="78" rx="36" ry="26" fill="#f4ebd9" stroke="#dbc3ab" stroke-width="1.5"/>
+            <ellipse cx="90" cy="85" rx="30" ry="22" fill="#fffaf2" stroke="#e6d4c1" stroke-width="1.5"/>
+            <circle cx="100" cy="65" r="16" fill="#eed59b" opacity="0.9"/>
+            <circle cx="98" cy="63" r="10" fill="#cda863"/>
+            <circle cx="98" cy="63" r="5" fill="#8e6727"/>
+          </svg>
+
+          <div class="album-hero-img-box" (click)="openPhotoModalByIndex(7)" title="Bấm để xem ảnh lớn">
+            <img [src]="photoList[7] || photoList[0]" alt="Ảnh cưới chính nghệ thuật" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. WEDDING GIFT SECTION (HỘP QUÀ 3D BAY BỔNG KÈM KHINH KHÍ CẦU TRÁI TIM SVG) -->
+    <section class="section gift-section m-slide-up" id="weddingGiftSec">
+      <div class="section-header">
+        <p class="section-sub">HỘP MỪNG CƯỚI ONLINE</p>
+        <h2 class="section-title">Gửi Quà Mừng</h2>
+        <div class="gold-divider">♦</div>
+        <p class="gift-subtext">Sự hiện diện của bạn là món quà ý nghĩa nhất. Nếu muốn gửi lời chúc mừng từ phương xa, bạn có thể gửi quà mừng qua hộp quà yêu thương bên dưới.</p>
+      </div>
+
+      <!-- Sân khấu Hộp Quà 3D Tương Tác -->
+      <div class="gift-stage-card m-slide-up">
+        <!-- SVG Hộp Quà 3D Hồng & Bóng Trái Tim Bay Bổng -->
+        <div class="gift-box-interactive" (click)="openGiftModal()" title="Bấm để mở hộp quà mừng cưới">
+          <svg viewBox="0 0 260 330" width="220" height="280" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="heartGradClient" x1="20%" y1="0%" x2="80%" y2="100%">
+                <stop offset="0%" stop-color="#ffb3c6" />
+                <stop offset="45%" stop-color="#ff758f" />
+                <stop offset="100%" stop-color="#c9184a" />
+              </linearGradient>
+              <radialGradient id="heartHighlightClient" cx="35%" cy="30%" r="50%">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+                <stop offset="50%" stop-color="#ffb3c6" stop-opacity="0.3" />
+                <stop offset="100%" stop-color="#ff758f" stop-opacity="0" />
+              </radialGradient>
+              <linearGradient id="boxFrontClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffd5dc" />
+                <stop offset="100%" stop-color="#f7a8b8" />
+              </linearGradient>
+              <linearGradient id="boxSideClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f295a8" />
+                <stop offset="100%" stop-color="#d96b82" />
+              </linearGradient>
+              <linearGradient id="boxTopClient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ffe3e8" />
+                <stop offset="100%" stop-color="#ffccd5" />
+              </linearGradient>
+              <linearGradient id="goldRibbonClient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff0c2" />
+                <stop offset="35%" stop-color="#fcd34d" />
+                <stop offset="70%" stop-color="#f59e0b" />
+                <stop offset="100%" stop-color="#b45309" />
+              </linearGradient>
+              <radialGradient id="boxGlowClient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#ff758f" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#ff758f" stop-opacity="0" />
+              </radialGradient>
+              <filter id="shadow3dClient" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="rgba(0,0,0,0.18)" />
+              </filter>
+            </defs>
+
+            <!-- Vầng sáng mềm mại phía sau -->
+            <ellipse cx="130" cy="190" rx="95" ry="75" fill="url(#boxGlowClient)" />
+
+            <!-- Nhóm Animated Floating Group -->
+            <g class="gift-float-art">
+              <!-- Sợi dây bóng lấp lánh -->
+              <path d="M130,95 C133,125 127,150 130,172" stroke="#f59e0b" stroke-width="2" stroke-dasharray="3,2" fill="none" />
+
+              <!-- Khinh khí cầu Trái Tim 3D -->
+              <g transform="translate(130, 56) scale(0.88)" filter="url(#shadow3dClient)">
+                <path d="M0,28 C-35,-12 -65,-3 0,-48 C65,-3 35,-12 0,28 Z" transform="scale(1.2) translate(0, 8)" fill="url(#heartGradClient)" />
+                <path d="M0,28 C-35,-12 -65,-3 0,-48 C65,-3 35,-12 0,28 Z" transform="scale(1.2) translate(0, 8)" fill="url(#heartHighlightClient)" />
+                <polygon points="-4,44 4,44 0,38" fill="#c9184a" />
+              </g>
+
+              <!-- Hộp quà 3D thắt nơ vàng -->
+              <g transform="translate(130, 218)" filter="url(#shadow3dClient)">
+                <polygon points="0,0 -52,-20 -52,40 0,62" fill="url(#boxFrontClient)" />
+                <polygon points="0,0 52,-20 52,40 0,62" fill="url(#boxSideClient)" />
+                <polygon points="-5,0 -20,-6 -20,54 -5,60" fill="url(#goldRibbonClient)" />
+                <polygon points="5,0 20,-6 20,54 5,60" fill="url(#goldRibbonClient)" />
+                <polygon points="0,26 -52,6 -52,16 0,36" fill="url(#goldRibbonClient)" />
+                <polygon points="0,26 52,6 52,16 0,36" fill="url(#goldRibbonClient)" />
+
+                <polygon points="0,-24 -56,-45 0,-65 56,-45" fill="url(#boxTopClient)" />
+                <polygon points="0,-24 -56,-45 -56,-38 0,-17" fill="url(#boxFrontClient)" />
+                <polygon points="0,-24 56,-45 56,-38 0,-17" fill="url(#boxSideClient)" />
+                <polygon points="-7,-28 -7,-61 7,-61 7,-28" fill="url(#goldRibbonClient)" />
+                <polygon points="-40,-39 40,-52 40,-45 -40,-32" fill="url(#goldRibbonClient)" />
+
+                <path d="M0,-46 C-22,-70 -38,-54 -8,-42 Z" fill="url(#goldRibbonClient)" />
+                <path d="M0,-46 C22,-70 38,-54 8,-42 Z" fill="url(#goldRibbonClient)" />
+                <circle cx="0" cy="-45" r="5.5" fill="#fef08a" stroke="#b45309" stroke-width="1.5" />
+                <path d="M-2,-42 C-12,-32 -18,-18 -22,-14 C-18,-16 -12,-20 -1,-39 Z" fill="url(#goldRibbonClient)" />
+                <path d="M2,-42 C12,-32 18,-18 22,-14 C18,-16 12,-20 1,-39 Z" fill="url(#goldRibbonClient)" />
+              </g>
+            </g>
+
+            <!-- Bóng đổ co giãn theo nhịp bay -->
+            <ellipse class="gift-shadow-pulse" cx="130" cy="304" rx="60" ry="10" fill="#000000" />
+          </svg>
+        </div>
+
+        <h3 class="gift-couple-script">{{ wedding.groomName }} & {{ wedding.brideName }}</h3>
+        <div class="gift-gratitude-pill">TRÂN TRỌNG CẢM ƠN</div>
+
+        <div>
+          <button type="button" class="btn-open-gift-modal" (click)="openGiftModal()">
+            <i class="fa-solid fa-gift" style="color: #ff3366;"></i> Mở Hộp Quà Mừng Cưới
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. RSVP FORM SECTION -->
+    <section id="rsvp" class="section rsvp-section m-slide-up">
+      <div class="section-header">
+        <p class="section-sub">PHẢN HỒI THAM DỰ</p>
+        <h2 class="section-title">Xác Nhận Tham Dự</h2>
+        <div class="gold-divider">♦</div>
+        <p class="rsvp-subtext">Để chuẩn bị chu đáo nhất cho sự hiện diện của bạn, vui lòng xác nhận trước ngày cưới nhé!</p>
+      </div>
+
+      <div class="rsvp-card-wrapper">
+        <div class="rsvp-success-alert" *ngIf="rsvpSubmitted">
+          <i class="fa-solid fa-circle-check"></i>
+          <h4>{{ rsvpMessage }}</h4>
+          <p>Nếu có thay đổi về lịch trình, bạn có thể chỉnh sửa lại phản hồi bất cứ lúc nào.</p>
+        </div>
+
+        <form (ngSubmit)="submitRsvp()" class="rsvp-form" *ngIf="!rsvpSubmitted || rsvpSubmitting">
+          <div class="form-group attendance-choice">
+            <label class="choice-label" [class.active]="rsvpModel.isAttending">
+              <input type="radio" name="attendance" [value]="true" [(ngModel)]="rsvpModel.isAttending">
+              <i class="fa-solid fa-champagne-glasses"></i>
+              <span>Tôi Sẽ Tham Dự</span>
+            </label>
+
+            <label class="choice-label" [class.active]="!rsvpModel.isAttending">
+              <input type="radio" name="attendance" [value]="false" [(ngModel)]="rsvpModel.isAttending">
+              <i class="fa-solid fa-heart-crack"></i>
+              <span>Rất Tiếc Tôi Bận</span>
+            </label>
+          </div>
+
+          <div class="form-group" *ngIf="rsvpModel.isAttending">
+            <label class="input-label"><i class="fa-solid fa-users"></i> Số Lượng Khách Đi Cùng (Bao gồm bạn):</label>
+            <select class="form-control" name="guestCount" [(ngModel)]="rsvpModel.guestCount">
+              <option [value]="1">1 Người (Đi 1 mình)</option>
+              <option [value]="2">2 Người (Cùng người thương/bạn bè)</option>
+              <option [value]="3">3 Người (Cùng gia đình)</option>
+              <option [value]="4">4+ Người</option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="rsvpModel.isAttending">
+            <label class="input-label"><i class="fa-solid fa-utensils"></i> Ghi Chú Ăn Uống (Nếu có):</label>
+            <input type="text" class="form-control" placeholder="Ví dụ: Ăn chay, dị ứng hải sản..." name="dietary" [(ngModel)]="rsvpModel.dietaryNotes">
+          </div>
+
+          <div class="form-group">
+            <label class="input-label"><i class="fa-solid fa-comment-dots"></i> Lời Nhắn Tới Cô Dâu & Chú Rể:</label>
+            <textarea class="form-control" rows="3" placeholder="Gửi lời nhắn đặc biệt cho đôi tân lang tân nương..." name="requests" [(ngModel)]="rsvpModel.specialRequests"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit-rsvp" [disabled]="rsvpSubmitting">
+            <i class="fa-solid" [class.fa-paper-plane]="!rsvpSubmitting" [class.fa-spinner]="rsvpSubmitting" [class.fa-spin]="rsvpSubmitting"></i>
+            {{ rsvpSubmitting ? 'Đang gửi...' : 'Gửi Phản Hồi Tham Dự' }}
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 7. WISHES WALL SECTION -->
+    <section class="section wishes-section m-slide-up">
+      <div class="section-header">
+        <p class="section-sub">SỔ LƯU BÚT</p>
+        <h2 class="section-title">Gửi Lời Chúc Phúc</h2>
+        <div class="gold-divider">♦</div>
+      </div>
+
+      <div class="wishes-container">
+        <!-- Wish form -->
+        <div class="wish-form-card">
+          <h3><i class="fa-solid fa-pen-nib"></i> Viết Lời Chúc</h3>
+          
+          <div class="alert-success-banner" *ngIf="wishSuccessMessage">
+            {{ wishSuccessMessage }}
+          </div>
+
+          <div class="form-group">
+            <label class="input-label">Tên của bạn:</label>
+            <input type="text" class="form-control" placeholder="Nhập tên hoặc biệt danh..." [(ngModel)]="wishModel.senderName">
+          </div>
+
+          <div class="form-group">
+            <label class="input-label">Lời chúc ngọt ngào:</label>
+            <textarea class="form-control" rows="3" placeholder="Gửi những lời chúc mừng hạnh phúc tốt lành nhất..." [(ngModel)]="wishModel.message"></textarea>
+          </div>
+
+          <button class="btn-primary-gold" (click)="submitWish()" [disabled]="wishSubmitting || !wishModel.senderName || !wishModel.message">
+            <i class="fa-solid fa-heart"></i> {{ wishSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc' }}
+          </button>
+        </div>
+
+        <!-- Wishes List Feed -->
+        <div class="wishes-feed">
+          <div class="wish-bubble" *ngFor="let w of wishes">
+            <div class="wish-avatar">
+              <i class="fa-solid fa-user-heart"></i>
+            </div>
+            <div class="wish-body">
+              <h5 class="wish-sender">{{ w.senderName }}</h5>
+              <p class="wish-text">{{ w.message }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="wedding-footer">
+    <div class="footer-heart"><i class="fa-solid fa-heart"></i></div>
+    <h3 class="footer-title">{{ wedding.groomName }} & {{ wedding.brideName }}</h3>
+    <p class="footer-thanks">Cảm ơn bạn đã luôn đồng hành, chúc phúc và chia sẻ niềm vui cùng gia đình chúng tôi!</p>
+    <div class="footer-links">
+      <a routerLink="/admin" class="admin-link-btn"><i class="fa-solid fa-shield-halved"></i> Quản Trị Hệ Thống</a>
+    </div>
+  </footer>
+
+  <!-- ============================================================ -->
+  <!-- MODAL HỘP QUÀ YÊU THƯƠNG (POPUP TABS CÔ DÂU / CHÚ RỂ + VIETQR) -->
+  <!-- ============================================================ -->
+  <div class="gift-modal-backdrop" [class.show]="isGiftModalOpen" (click)="closeGiftModal()">
+    <div class="gift-modal-card" (click)="$event.stopPropagation()">
+      <button type="button" class="gift-modal-close" (click)="closeGiftModal()" aria-label="Đóng">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h3 class="gift-modal-title">Hộp Quà Yêu Thương</h3>
+      <p class="gift-modal-subtitle">Quét QR code để gửi yêu thương trực tiếp tới:</p>
+
+      <!-- Tabs chuyển Cô dâu / Chú rể -->
+      <div class="gift-tab-switch">
+        <button type="button" class="gift-tab-btn" [class.active]="activeGiftTab === 'bride'" (click)="switchGiftTab('bride')">
+          <i class="fa-solid fa-gem"></i> Cô dâu
+        </button>
+        <button type="button" class="gift-tab-btn" [class.active]="activeGiftTab === 'groom'" (click)="switchGiftTab('groom')">
+          <i class="fa-solid fa-crown"></i> Chú rể
+        </button>
+      </div>
+
+      <!-- Card Cô dâu -->
+      <div class="gift-qr-inner-card" *ngIf="activeGiftTab === 'bride'">
+        <div class="gift-role-label">Cô dâu</div>
+        <div class="gift-qr-box">
+          <img [src]="'https://img.vietqr.io/image/TCB-' + (brideGift?.accountNumber || '19036789012345') + '-compact2.png?amount=0&addInfo=MungCuoi QuangThang NgocLan'" alt="VietQR Cô dâu">
+        </div>
+        <h4 class="gift-recipient-name">{{ brideGift?.accountHolder || wedding.brideName }}</h4>
+        <p class="gift-bank-title">{{ brideGift?.bankName || 'Techcombank' }}</p>
+        <p class="gift-stk-number">{{ brideGift?.accountNumber || '19036789012345' }}</p>
+        <button type="button" class="btn-copy-gift-pill" (click)="copyGiftStk(brideGift?.accountNumber || '19036789012345', 'Cô dâu')">
+          <i class="fa-regular fa-copy"></i> Sao chép số TK
+        </button>
+      </div>
+
+      <!-- Card Chú rể -->
+      <div class="gift-qr-inner-card groom-card" *ngIf="activeGiftTab === 'groom'">
+        <div class="gift-role-label groom">Chú rể</div>
+        <div class="gift-qr-box groom-qr">
+          <img [src]="'https://img.vietqr.io/image/VCB-' + (groomGift?.accountNumber || '0071000123456') + '-compact2.png?amount=0&addInfo=MungCuoi QuangThang NgocLan'" alt="VietQR Chú rể">
+        </div>
+        <h4 class="gift-recipient-name">{{ groomGift?.accountHolder || wedding.groomName }}</h4>
+        <p class="gift-bank-title">{{ groomGift?.bankName || 'Vietcombank' }}</p>
+        <p class="gift-stk-number">{{ groomGift?.accountNumber || '0071000123456' }}</p>
+        <button type="button" class="btn-copy-gift-pill groom-btn" (click)="copyGiftStk(groomGift?.accountNumber || '0071000123456', 'Chú rể')">
+          <i class="fa-regular fa-copy"></i> Sao chép số TK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- PRO FULLSCREEN LIGHTBOX (ALBUM ẢNH CƯỚI KÈM DẢI THUMBNAIL) -->
+  <!-- ============================================================ -->
+  <div class="pro-lightbox" [class.show]="isLightboxOpen" (click)="closePhotoModal()">
+    <!-- Top Toolbar Actions -->
+    <div class="lb-top-bar" (click)="$event.stopPropagation()">
+      <div class="lb-counter">
+        Ảnh <span>{{ currentLbIndex + 1 }}</span> / {{ photoList.length }}
+      </div>
+      <div class="lb-actions-group">
+        <button type="button" class="lb-icon-btn" (click)="toggleLbFullscreen()" title="Toàn màn hình">
+          <i class="fa-solid" [class.fa-expand]="!isLbFullscreen" [class.fa-compress]="isLbFullscreen"></i>
+        </button>
+        <button type="button" class="lb-icon-btn" (click)="toggleLbSlideshow()" title="Tự động trình chiếu">
+          <i class="fa-solid" [class.fa-play]="!isLbPlaying" [class.fa-pause]="isLbPlaying"></i>
+        </button>
+        <button type="button" class="lb-icon-btn" (click)="zoomLightbox(1.2)" title="Phóng to">
+          <i class="fa-solid fa-magnifying-glass-plus"></i>
+        </button>
+        <button type="button" class="lb-icon-btn" (click)="zoomLightbox(0.8)" title="Thu nhỏ">
+          <i class="fa-solid fa-magnifying-glass-minus"></i>
+        </button>
+        <button type="button" class="lb-icon-btn" (click)="closePhotoModal()" title="Đóng">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Stage Image -->
+    <div class="lb-stage">
+      <button type="button" class="lb-nav-arrow prev" (click)="prevLightboxPhoto($event)">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <img class="lb-main-img" [src]="photoList[currentLbIndex]" alt="Ảnh cưới phóng to" [style.transform]="'scale(' + lbZoomLevel + ')'" (click)="$event.stopPropagation()">
+      <button type="button" class="lb-nav-arrow next" (click)="nextLightboxPhoto($event)">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Bottom Thumbnail Strip -->
+    <div class="lb-thumb-strip-wrap" (click)="$event.stopPropagation()">
+      <div class="lb-thumb-item" *ngFor="let thumbUrl of photoList; let idx = index" [class.active]="idx === currentLbIndex" (click)="openPhotoModalByIndex(idx)">
+        <img [src]="thumbUrl" [alt]="'Thumb ' + (idx + 1)" loading="lazy">
+      </div>
+    </div>
+  </div>
+
+</div>

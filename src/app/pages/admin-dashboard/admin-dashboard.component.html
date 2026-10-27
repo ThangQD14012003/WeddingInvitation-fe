@@ -1,0 +1,290 @@
+<div class="admin-wrapper">
+  <!-- Top Bar -->
+  <header class="admin-header">
+    <div class="header-left">
+      <div class="admin-logo">
+        <i class="fa-solid fa-rings-wedding"></i>
+      </div>
+      <div>
+        <h2>Quản Trị Đám Cưới</h2>
+        <p class="admin-subtitle">Trần Quang Thắng & Nguyễn Ngọc Lan • 20/11/2026</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <a routerLink="/" class="btn-view-invitation" target="_blank">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Thiệp Cưới Khách
+      </a>
+      <div class="admin-profile">
+        <span class="admin-avatar">AD</span>
+        <span class="admin-name">Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Message -->
+  <div class="admin-toast" *ngIf="toastMessage">
+    <i class="fa-solid fa-circle-check"></i> {{ toastMessage }}
+  </div>
+
+  <div class="admin-container">
+    <!-- STATS CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon icon-blue">
+          <i class="fa-solid fa-envelope"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalInvited }}</span>
+          <span class="stat-title">Tổng Khách Mời</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-green">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalAttending }}</span>
+          <span class="stat-title">Xác Nhận Tham Dự</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-red">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalDeclined }}</span>
+          <span class="stat-title">Không Tham Dự</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-yellow">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalPending }}</span>
+          <span class="stat-title">Chưa Phản Hồi</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-purple">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalGuestsExpected }}</span>
+          <span class="stat-title">Dự Kiến Số Ghế</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon icon-pink">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+        <div class="stat-data">
+          <span class="stat-num">{{ stats.totalWishes }}</span>
+          <span class="stat-title">Lời Chúc Phúc</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="admin-tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'guests'" (click)="activeTab = 'guests'">
+        <i class="fa-solid fa-users-line"></i> Quản Lý Khách Mời ({{ guests.length }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'wishes'" (click)="activeTab = 'wishes'">
+        <i class="fa-solid fa-comments"></i> Duyệt Lời Chúc ({{ wishes.length }})
+      </button>
+    </div>
+
+    <!-- TAB 1: GUESTS MANAGEMENT -->
+    <div class="tab-content" *ngIf="activeTab === 'guests'">
+      <!-- Toolbar: Search, Filters, Actions -->
+      <div class="table-toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Tìm kiếm tên, số điện thoại, mã thiệp..." [(ngModel)]="searchTerm" (input)="filterGuests()">
+          </div>
+
+          <div class="filter-badges">
+            <button class="badge-filter" [class.active]="selectedFilter === 'All'" (click)="setFilter('All')">Tất cả</button>
+            <button class="badge-filter" [class.active]="selectedFilter === 'Confirmed'" (click)="setFilter('Confirmed')">Tham dự</button>
+            <button class="badge-filter" [class.active]="selectedFilter === 'Pending'" (click)="setFilter('Pending')">Chưa trả lời</button>
+            <button class="badge-filter" [class.active]="selectedFilter === 'Declined'" (click)="setFilter('Declined')">Từ chối</button>
+            <button class="badge-filter" [class.active]="selectedFilter === 'Groom'" (click)="setFilter('Groom')">Nhà Trai</button>
+            <button class="badge-filter" [class.active]="selectedFilter === 'Bride'" (click)="setFilter('Bride')">Nhà Gái</button>
+          </div>
+        </div>
+
+        <div class="toolbar-right">
+          <button class="btn-export" (click)="exportExcel()">
+            <i class="fa-solid fa-file-excel"></i> Xuất Excel
+          </button>
+          <button class="btn-add-guest" (click)="openAddModal()">
+            <i class="fa-solid fa-user-plus"></i> Thêm Khách Mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Guest Table -->
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Khách Mời</th>
+              <th>Bên</th>
+              <th>Nhóm Khách</th>
+              <th>Mã Thiệp & Link</th>
+              <th>Trạng Thái</th>
+              <th>Số Chỗ</th>
+              <th>Hành Động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of filteredGuests">
+              <td>
+                <div class="guest-name-cell">
+                  <strong>{{ g.fullName }}</strong>
+                  <span class="guest-sub-cell" *ngIf="g.phone">{{ g.phone }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="side-tag" [class.groom]="g.side === 'Groom'" [class.bride]="g.side === 'Bride'">
+                  {{ g.side === 'Groom' ? 'Nhà Trai' : (g.side === 'Bride' ? 'Nhà Gái' : 'Chung') }}
+                </span>
+              </td>
+              <td>{{ g.group?.groupName || 'Chung' }}</td>
+              <td>
+                <div class="code-copy-cell">
+                  <code>{{ g.invitations?.[0]?.invitationCode || 'N/A' }}</code>
+                  <button class="btn-icon-copy" (click)="copyInvitationLink(g.invitations?.[0]?.invitationCode)" title="Sao chép link mời cá nhân">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'status-confirmed': g.invitations?.[0]?.status === 'Confirmed',
+                  'status-pending': g.invitations?.[0]?.status === 'Pending' || g.invitations?.[0]?.status === 'Sent' || g.invitations?.[0]?.status === 'Opened',
+                  'status-declined': g.invitations?.[0]?.status === 'Declined'
+                }">
+                  {{ g.invitations?.[0]?.status === 'Confirmed' ? 'Đã xác nhận' : (g.invitations?.[0]?.status === 'Declined' ? 'Từ chối' : 'Chờ phản hồi') }}
+                </span>
+              </td>
+              <td><strong>{{ g.invitations?.[0]?.numberOfSeats || 1 }}</strong></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-delete-action" (click)="deleteGuest(g.id, g.fullName)" title="Xóa khách">
+                    <i class="fa-regular fa-trash-can"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredGuests.length === 0">
+              <td colspan="7" class="text-center-empty">
+                <i class="fa-regular fa-folder-open empty-icon"></i>
+                <p>Không tìm thấy khách mời nào phù hợp điều kiện lọc.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 2: WISHES MODERATION -->
+    <div class="tab-content" *ngIf="activeTab === 'wishes'">
+      <div class="wishes-admin-grid">
+        <div class="wish-admin-card" *ngFor="let w of wishes" [class.unapproved]="!w.isApproved">
+          <div class="wish-card-top">
+            <div class="sender-info">
+              <i class="fa-solid fa-user-circle"></i>
+              <strong>{{ w.senderName }}</strong>
+              <span class="wish-date">{{ w.createdAt | date:'HH:mm - dd/MM/yyyy' }}</span>
+            </div>
+            <span class="approval-tag" [class.approved]="w.isApproved">
+              {{ w.isApproved ? 'Đang hiển thị' : 'Đang ẩn' }}
+            </span>
+          </div>
+
+          <p class="wish-message-body">"{{ w.message }}"</p>
+
+          <div class="wish-card-actions">
+            <button class="btn-toggle-approve" (click)="toggleWish(w)">
+              <i class="fa-solid" [class.fa-eye]="!w.isApproved" [class.fa-eye-slash]="w.isApproved"></i>
+              {{ w.isApproved ? 'Ẩn lời chúc' : 'Duyệt hiển thị' }}
+            </button>
+            <button class="btn-delete-wish" (click)="deleteWish(w.id)">
+              <i class="fa-regular fa-trash-can"></i> Xóa
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="wishes.length === 0" class="empty-wishes-box">
+          <p>Chưa có lời chúc nào trong hệ thống.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ADD GUEST MODAL -->
+  <div class="modal-backdrop" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus"></i> Thêm Khách Mời Mới</h3>
+        <button class="btn-close-modal" (click)="closeAddModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="modal-label">Họ và tên khách mời (*):</label>
+          <input type="text" class="modal-input" placeholder="Ví dụ: Anh Nguyễn Văn Tuấn" [(ngModel)]="newGuest.fullName">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label class="modal-label">Số điện thoại:</label>
+            <input type="text" class="modal-input" placeholder="090..." [(ngModel)]="newGuest.phone">
+          </div>
+          <div class="form-group col-half">
+            <label class="modal-label">Email:</label>
+            <input type="email" class="modal-input" placeholder="email@example.com" [(ngModel)]="newGuest.email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label class="modal-label">Khách bên nào:</label>
+            <select class="modal-input" [(ngModel)]="newGuest.side">
+              <option value="Both">Chung hai bên</option>
+              <option value="Groom">Nhà Trai (Chú Rể)</option>
+              <option value="Bride">Nhà Gái (Cô Dâu)</option>
+            </select>
+          </div>
+          <div class="form-group col-half">
+            <label class="modal-label">Số lượng ghế dành riêng:</label>
+            <input type="number" min="1" max="10" class="modal-input" [(ngModel)]="newGuest.numberOfSeats">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="modal-label">Lời nhắn riêng trên thiệp:</label>
+          <textarea class="modal-input" rows="2" placeholder="Ví dụ: Rất mong sự hiện diện của bạn và người thương..." [(ngModel)]="newGuest.personalMessage"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAddModal()">Hủy</button>
+        <button class="btn-save" (click)="saveGuest()" [disabled]="!newGuest.fullName || isSubmittingGuest">
+          {{ isSubmittingGuest ? 'Đang lưu...' : 'Tạo Thiệp & Lưu' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
