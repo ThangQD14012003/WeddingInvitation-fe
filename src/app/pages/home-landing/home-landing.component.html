@@ -1,0 +1,444 @@
+<div class="landing-page-wrapper">
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="landing-header">
+    <div class="header-inner container-boxed">
+      <a routerLink="/" class="landing-brand">
+        <span class="brand-symbol"><i class="fa-solid fa-heart"></i></span>
+        <span class="brand-text">M-INVITE</span>
+        <span class="brand-sub">ONLINE</span>
+      </a>
+
+      <nav class="landing-nav">
+        <a (click)="scrollToSection('secTemplates')" class="nav-link">Mẫu Thiệp</a>
+        <a (click)="scrollToSection('secFeatures')" class="nav-link">Tính Năng</a>
+        <a (click)="scrollToSection('secPricing')" class="nav-link">Bảng Giá</a>
+        <a (click)="scrollToSection('secFaq')" class="nav-link">Hỏi Đáp</a>
+      </nav>
+
+      <div class="header-actions">
+        <a routerLink="/admin" class="btn-tenant-portal" title="Dành cho Cô dâu & Chú rể đã tạo thiệp">
+          <i class="fa-solid fa-user-lock"></i> <span>Quản Trị Thiệp</span>
+        </a>
+        <a routerLink="/super-admin" class="btn-superadmin-link" title="Dành cho Quản trị viên hệ thống">
+          <i class="fa-solid fa-shield-halved"></i> <span>Super Admin</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="landing-hero">
+    <div class="hero-bg-blobs">
+      <div class="blob-1"></div>
+      <div class="blob-2"></div>
+    </div>
+
+    <div class="container-boxed hero-content-grid">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <i class="fa-solid fa-sparkles"></i> Nền Tảng Thiệp Mời Điện Tử Thông Minh
+        </div>
+        <h1 class="hero-title">
+          Tạo Thiệp Cưới Online <br>
+          <span class="gradient-text">Sang Trọng & Độc Bản</span>
+        </h1>
+        <p class="hero-desc">
+          Gửi trọn thông điệp yêu thương chỉ trong một đường link duy nhất. Tích hợp hiệu ứng mở phong bì 3D, album ảnh tạp chí nghệ thuật, bản đồ Google Maps và nhận tiền mừng trực tiếp qua mã VietQR thông minh.
+        </p>
+
+        <div class="hero-cta-group">
+          <button type="button" class="btn-hero-primary" (click)="scrollToSection('secTemplates')">
+            <i class="fa-solid fa-compass"></i> Khám Phá Mẫu Thiệp
+          </button>
+          <a routerLink="/invite/thang-lan" [queryParams]="{ demo: true }" class="btn-hero-outline">
+            <i class="fa-solid fa-play"></i> Xem Demo Trực Tiếp
+          </a>
+        </div>
+
+        <div class="hero-stats-row">
+          <div class="stat-item">
+            <strong>12.000+</strong>
+            <span>Cặp đôi tin dùng</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <strong>85%</strong>
+            <span>Tiết kiệm chi phí</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <strong>4.9 / 5 ★</strong>
+            <span>Đánh giá hài lòng</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-phone-mockup">
+          <div class="phone-screen">
+            <div class="screen-notch"></div>
+            <div class="phone-card-preview">
+              <div class="preview-card-header">
+                <span class="preview-sub">LỄ THÀNH HÔN</span>
+                <h3 class="preview-names">Trần Thắng & Ngọc Lan</h3>
+                <p class="preview-date">20 • 11 • 2026</p>
+              </div>
+              <div class="preview-card-img">
+                <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=85" alt="Preview">
+                <div class="preview-play-badge">
+                  <i class="fa-solid fa-envelope-open"></i> Mở Thiệp 3D
+                </div>
+              </div>
+              <div class="preview-features-mini">
+                <span><i class="fa-solid fa-check"></i> RSVP</span>
+                <span><i class="fa-solid fa-check"></i> VietQR</span>
+                <span><i class="fa-solid fa-check"></i> Album So Le</span>
+              </div>
+            </div>
+          </div>
+          <div class="floating-badge badge-top-right">
+            <i class="fa-solid fa-qrcode" style="color: #a3252e;"></i> Mừng Cưới VietQR Tự Động
+          </div>
+          <div class="floating-badge badge-bottom-left">
+            <i class="fa-solid fa-music" style="color: #d4af37;"></i> Nhạc Nền Du Dương
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES FILTER BAR -->
+  <section class="landing-categories-bar" id="secTemplates">
+    <div class="container-boxed">
+      <div class="section-title-wrap text-center">
+        <span class="section-mini-badge">KHO MẪU ĐA DẠNG</span>
+        <h2 class="section-title">Chọn Danh Mục Thiệp Bạn Cần</h2>
+        <p class="section-subtitle">Tất cả mẫu thiệp đều hỗ trợ xem Demo trực tiếp trên điện thoại & máy tính</p>
+      </div>
+
+      <div class="categories-tab-list">
+        <button type="button" 
+                *ngFor="let cat of categories" 
+                class="category-tab-btn" 
+                [class.active]="activeCategory === cat.id"
+                (click)="setCategory(cat.id)">
+          <i class="fa-solid" [ngClass]="cat.icon"></i>
+          <span>{{ cat.name }}</span>
+          <span class="cat-count-badge" *ngIf="cat.count">({{ cat.count }})</span>
+          <span class="cat-coming-soon" *ngIf="cat.badge">{{ cat.badge }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEMPLATES SHOWCASE GRID -->
+  <section class="templates-showcase-section">
+    <div class="container-boxed">
+      <!-- Search & Filter Controls (If wedding active) -->
+      <div class="templates-controls" *ngIf="activeCategory === 'wedding'">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" [(ngModel)]="searchKeyword" (input)="applyFilter()" placeholder="Tìm kiếm mẫu thiệp (Liên Hạc, Champagne, Rustic...)">
+        </div>
+        <div class="template-count-hint">
+          Hiển thị <strong>{{ filteredTemplates.length }}</strong> mẫu thiệp cưới sẵn sàng
+        </div>
+      </div>
+
+      <!-- Wedding Templates Grid -->
+      <div class="templates-grid" *ngIf="activeCategory === 'wedding' && filteredTemplates.length > 0">
+        <div class="template-card" *ngFor="let t of filteredTemplates">
+          <div class="card-thumb-wrap">
+            <img [src]="t.previewImage" [alt]="t.name" class="thumb-img" loading="lazy">
+            <span class="card-badge" [style.background]="t.colorHex">{{ t.badge }}</span>
+            <div class="card-overlay-actions">
+              <button type="button" class="btn-overlay-demo" (click)="viewDemo(t)">
+                <i class="fa-solid fa-eye"></i> Xem Demo
+              </button>
+              <button type="button" class="btn-overlay-use" (click)="openCreateModal(t)">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Dùng Mẫu Này
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-tag-row">
+              <span class="card-tag">{{ t.tag }}</span>
+              <span class="card-color-chip">
+                <span class="color-dot" [style.background]="t.colorHex"></span> {{ t.colorScheme }}
+              </span>
+            </div>
+
+            <h3 class="card-title">{{ t.name }}</h3>
+            <p class="card-desc">{{ t.description }}</p>
+
+            <div class="card-features-chips">
+              <span class="f-chip" *ngFor="let f of t.features">
+                <i class="fa-solid fa-check"></i> {{ f }}
+              </span>
+            </div>
+
+            <div class="card-actions-bar">
+              <button type="button" class="btn-card-demo" (click)="viewDemo(t)">
+                <i class="fa-solid fa-eye"></i> Xem Demo
+              </button>
+              <button type="button" class="btn-card-primary" (click)="openCreateModal(t)">
+                <span>Tạo Thiệp</span> <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMING SOON STATE FOR OTHER CATEGORIES -->
+      <div class="coming-soon-box" *ngIf="activeCategory !== 'wedding'">
+        <div class="cs-icon-wrap">
+          <i class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <h3 class="cs-title">Bộ Sưu Tập Đang Được Thiết Kế!</h3>
+        <p class="cs-desc">
+          Đội ngũ thiết kế của M-Invite đang hoàn thiện các mẫu thiệp độc đáo cho chuyên mục này. Hãy để lại thông tin để nhận thông báo và ưu đãi 50% ngay khi ra mắt!
+        </p>
+        <button type="button" class="btn-cs-notify" (click)="setCategory('wedding')">
+          <i class="fa-solid fa-heart"></i> Xem Kho Thiệp Cưới Có Sẵn
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="landing-features-sec" id="secFeatures">
+    <div class="container-boxed">
+      <div class="section-title-wrap text-center">
+        <span class="section-mini-badge">TẠI SAO CHỌN M-INVITE?</span>
+        <h2 class="section-title">Tính Năng Vượt Trội So Với Thiệp Giấy</h2>
+        <p class="section-subtitle">Mang đến trải nghiệm tiện nghi, bất ngờ và chu đáo nhất cho từng vị khách mời</p>
+      </div>
+
+      <div class="features-grid-6">
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #a3252e; background: rgba(163, 37, 46, 0.1);">
+            <i class="fa-solid fa-envelope-open-text"></i>
+          </div>
+          <h4>Mở Phong Bì 3D Tương Tác</h4>
+          <p>Hiệu ứng kéo mở phong bì và cánh hoa bay lãng mạn tạo ấn tượng ngập tràn cảm xúc ngay từ lần chạm đầu tiên.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #d4af37; background: rgba(212, 175, 55, 0.12);">
+            <i class="fa-solid fa-images"></i>
+          </div>
+          <h4>Album Ảnh Tạp Chí So Le</h4>
+          <p>Bố cục Mosaic không dàn đều nhàm chán, hiển thị hình ảnh cưới chuẩn phong cách Vogue, kèm trình phóng to Lightbox.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #0284c7; background: rgba(2, 132, 199, 0.1);">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <h4>RSVP Thông Minh Tự Động</h4>
+          <p>Khách bấm xác nhận tham dự, số người đi kèm và yêu cầu ăn uống. Dữ liệu tổng hợp tức thì vào Dashboard quản lý.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #16a34a; background: rgba(22, 163, 74, 0.1);">
+            <i class="fa-solid fa-qrcode"></i>
+          </div>
+          <h4>Mừng Cưới VietQR Tiện Lợi</h4>
+          <p>Khách ở xa có thể quét mã QR ngân hàng để gửi tiền mừng trực tiếp, bảo mật tuyệt đối, tiền về thẳng tài khoản bạn.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
+            <i class="fa-solid fa-map-location-dot"></i>
+          </div>
+          <h4>Bản Đồ Google Maps 1 Chạm</h4>
+          <p>Tích hợp chỉ đường dẫn lối chính xác đến nhà thờ, tư gia hay trung tâm tiệc cưới mà không lo khách bị lạc đường.</p>
+        </div>
+
+        <div class="feat-card">
+          <div class="feat-icon-box" style="color: #9333ea; background: rgba(147, 51, 234, 0.1);">
+            <i class="fa-solid fa-share-nodes"></i>
+          </div>
+          <h4>Gửi Nhanh Qua Zalo / SMS</h4>
+          <p>Không mất công đi phát thiệp giấy xa xôi, sao chép link cá nhân hóa và gửi tới hàng trăm khách trong tích tắc.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING PACKAGES -->
+  <section class="landing-pricing-sec" id="secPricing">
+    <div class="container-boxed">
+      <div class="section-title-wrap text-center">
+        <span class="section-mini-badge">BẢNG GIÁ MINH BẠCH</span>
+        <h2 class="section-title">Gói Dịch Vụ Phù Hợp Cho Mọi Cặp Đôi</h2>
+        <p class="section-subtitle">Chỉ từ 199k cho một đám cưới hoàn hảo, không phát sinh chi phí ẩn</p>
+      </div>
+
+      <div class="pricing-cards-grid">
+        <!-- Gói Basic -->
+        <div class="price-card">
+          <div class="price-header">
+            <h3>Cơ Bản (Basic)</h3>
+            <p class="price-sub">Dành cho hôn lễ ấm cúng, quy mô nhỏ</p>
+            <div class="price-val">199.000đ <span>/ lần</span></div>
+          </div>
+          <ul class="price-features">
+            <li><i class="fa-solid fa-check"></i> Lưu trữ thiệp online trong 1 tháng</li>
+            <li><i class="fa-solid fa-check"></i> Chọn 1 trong 4 mẫu thiệp cưới</li>
+            <li><i class="fa-solid fa-check"></i> Album tối đa 6 ảnh cưới</li>
+            <li><i class="fa-solid fa-check"></i> Tích hợp bản đồ chỉ đường Google Maps</li>
+            <li><i class="fa-solid fa-check"></i> Mừng cưới VietQR tự động</li>
+            <li class="disabled"><i class="fa-solid fa-xmark"></i> Không có quản lý khách RSVP</li>
+          </ul>
+          <button type="button" class="btn-price-action" (click)="scrollToSection('secTemplates')">Chọn Gói</button>
+        </div>
+
+        <!-- Gói Standard (Popular) -->
+        <div class="price-card featured">
+          <div class="popular-ribbon">PHỔ BIẾN NHẤT</div>
+          <div class="price-header">
+            <h3>Tiêu Chuẩn (Standard)</h3>
+            <p class="price-sub">Lựa chọn tối ưu cho đám cưới hiện đại</p>
+            <div class="price-val">399.000đ <span>/ lần</span></div>
+          </div>
+          <ul class="price-features">
+            <li><i class="fa-solid fa-check"></i> Lưu trữ thiệp trong <strong>6 tháng</strong></li>
+            <li><i class="fa-solid fa-check"></i> Mở khóa toàn bộ mẫu thiệp cao cấp</li>
+            <li><i class="fa-solid fa-check"></i> <strong>Album ảnh so le Mosaic</strong> không giới hạn ảnh</li>
+            <li><i class="fa-solid fa-check"></i> <strong>Xác nhận tham dự (RSVP)</strong> & thống kê mâm cỗ</li>
+            <li><i class="fa-solid fa-check"></i> Sổ lưu bút nhận lời chúc từ khách</li>
+            <li><i class="fa-solid fa-check"></i> Dashboard quản trị khách mời riêng</li>
+          </ul>
+          <button type="button" class="btn-price-action btn-price-popular" (click)="scrollToSection('secTemplates')">Bắt Đầu Ngay</button>
+        </div>
+
+        <!-- Gói VIP -->
+        <div class="price-card">
+          <div class="price-header">
+            <h3>VIP Hoàng Gia</h3>
+            <p class="price-sub">Trọn vẹn đẳng cấp và cá nhân hóa tối đa</p>
+            <div class="price-val">599.000đ <span>/ lần</span></div>
+          </div>
+          <ul class="price-features">
+            <li><i class="fa-solid fa-check"></i> <strong>Lưu trữ thiệp vĩnh viễn</strong> làm kỷ niệm</li>
+            <li><i class="fa-solid fa-check"></i> Tên miền riêng (vd: thanglan.wedding)</li>
+            <li><i class="fa-solid fa-check"></i> Nhạc nền bài hát theo yêu cầu</li>
+            <li><i class="fa-solid fa-check"></i> Xuất dữ liệu mừng cưới & khách ra file Excel</li>
+            <li><i class="fa-solid fa-check"></i> Chuyên viên hỗ trợ thiết kế riêng 1:1</li>
+          </ul>
+          <button type="button" class="btn-price-action" (click)="scrollToSection('secTemplates')">Chọn Gói VIP</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL ĐĂNG KÝ TẠO THIỆP -->
+  <div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button type="button" class="btn-modal-close" (click)="closeModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="modal-header">
+        <span class="modal-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> KHỞI TẠO THIỆP MỜI</span>
+        <h3 class="modal-title">Bắt Đầu Tạo Thiệp {{ selectedTemplateForUse?.name }}</h3>
+        <p class="modal-desc">Điền thông tin cơ bản để nhận bản xem thử thiệp cưới cá nhân hóa cho riêng bạn</p>
+      </div>
+
+      <form (submit)="submitRegister(); $event.preventDefault()" class="modal-form">
+        <div class="form-group">
+          <label>Họ và tên của bạn <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="registerForm.fullName" name="fullName" placeholder="VD: Trần Quang Thắng" required>
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại / Zalo nhận link thiệp <span class="req">*</span></label>
+          <input type="tel" [(ngModel)]="registerForm.phone" name="phone" placeholder="VD: 0901234567" required>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Ngày cưới dự kiến</label>
+            <input type="date" [(ngModel)]="registerForm.weddingDate" name="weddingDate">
+          </div>
+          <div class="form-group">
+            <label>Gói dịch vụ</label>
+            <select [(ngModel)]="registerForm.package" name="package">
+              <option value="Basic">Cơ Bản (199.000đ)</option>
+              <option value="Standard">Tiêu Chuẩn (399.000đ)</option>
+              <option value="VIP">VIP Hoàng Gia (599.000đ)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-cancel" (click)="closeModal()">Đóng</button>
+          <button type="submit" class="btn-modal-submit">
+            <i class="fa-solid fa-paper-plane"></i> Gửi Yêu Cầu Tạo Thiệp
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="landing-footer" id="secFaq">
+    <div class="container-boxed footer-grid">
+      <div class="footer-col-main">
+        <div class="landing-brand">
+          <span class="brand-symbol"><i class="fa-solid fa-heart"></i></span>
+          <span class="brand-text">M-INVITE</span>
+          <span class="brand-sub">PLATFORM</span>
+        </div>
+        <p class="footer-brand-desc">
+          Nền tảng thiệp mời điện tử thông minh hàng đầu Việt Nam. Giúp bạn gửi trọn niềm vui ngày trọng đại tới những người thương yêu nhất.
+        </p>
+        <div class="footer-social-links">
+          <a href="#" class="social-btn"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="social-btn"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="social-btn"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Danh Mục Thiệp</h4>
+        <ul>
+          <li><a (click)="setCategory('wedding'); scrollToSection('secTemplates')">Thiệp Cưới Online</a></li>
+          <li><a (click)="setCategory('housewarming'); scrollToSection('secTemplates')">Thiệp Mời Tân Gia</a></li>
+          <li><a (click)="setCategory('graduation'); scrollToSection('secTemplates')">Thiệp Lễ Tốt Nghiệp</a></li>
+          <li><a (click)="setCategory('birthday'); scrollToSection('secTemplates')">Sinh Nhật & Thôi Nôi</a></li>
+          <li><a (click)="setCategory('events'); scrollToSection('secTemplates')">Sự Kiện & Doanh Nghiệp</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Trang Quản Trị</h4>
+        <ul>
+          <li><a routerLink="/admin">Dashboard Cô Dâu Chú Rể</a></li>
+          <li><a routerLink="/super-admin">Hệ Thống Super Admin</a></li>
+          <li><a routerLink="/invite/thang-lan" [queryParams]="{ demo: true }">Xem Mẫu Demo Trực Tiếp</a></li>
+          <li><a (click)="scrollToSection('secPricing')">Bảng Giá Dịch Vụ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Hỗ Trợ & Liên Hệ</h4>
+        <p><i class="fa-solid fa-phone"></i> Hotline: 1900 8888 (8h - 21h)</p>
+        <p><i class="fa-solid fa-envelope"></i> Email: support@minvite.vn</p>
+        <p><i class="fa-solid fa-location-dot"></i> Trụ sở: Tòa nhà TECAPRO, TP. Hồ Chí Minh</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container-boxed bottom-flex">
+        <p>© 2026 M-Invite Platform. Bản quyền thuộc về TECAPRO Wedding Solutions.</p>
+        <div class="bottom-links">
+          <a href="#">Điều khoản sử dụng</a> • <a href="#">Chính sách bảo mật</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

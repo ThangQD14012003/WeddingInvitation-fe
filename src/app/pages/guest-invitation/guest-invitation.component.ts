@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { WeddingService, WeddingData, GuestWish, GiftRegistry } from '../../services/wedding.service';
 
@@ -7,7 +7,7 @@ import { WeddingService, WeddingData, GuestWish, GiftRegistry } from '../../serv
   templateUrl: './guest-invitation.component.html',
   styleUrls: ['./guest-invitation.component.css']
 })
-export class GuestInvitationComponent implements OnInit, OnDestroy {
+export class GuestInvitationComponent implements OnInit, AfterViewInit, OnDestroy {
   slug: string = 'thang-lan';
   invitationCode: string = '';
   invitationData: any = null;
@@ -15,8 +15,45 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
   loading: boolean = true;
   isPlayingMusic: boolean = false;
   audioPlayer: HTMLAudioElement | null = null;
+  private scrollObserver: IntersectionObserver | null = null;
+  // M-Invite Luxury Envelope Opening Curtain
+  isEnvelopeOpened: boolean = false;
+  // Demo Mode & Template Theme
+  isDemoMode: boolean = false;
+  selectedTemplate: string = 'lotus-red';
+  availableTemplates = [
+    { id: 'lotus-red', name: 'Liên Hạc (Đỏ)', color: '#a3252e' },
+    { id: 'wedding-minimal-darkred', name: 'Tối Giản (Đỏ Đô)', color: '#7a1f2b' },
+    { id: 'envelope-red', name: 'Phong Thư (Đỏ)', color: '#8e1b2c' },
+    { id: 'songhy-red', name: 'Song Hỷ (Đỏ)', color: '#b91c1c' },
+    { id: 'photo-moment', name: 'Khoảnh Khắc (Tạp Chí)', color: '#18181b' },
+    { id: 'wedding-floral-blush', name: 'Hoa Màu Nước (Hồng)', color: '#e11d48' },
+    { id: 'dragon-red', name: 'Long Phụng (Đỏ)', color: '#851a22' },
+    { id: 'royal-darkred', name: 'Cung Đình (Đỏ Đô)', color: '#6b1118' },
+    { id: 'polaroid-beige', name: 'Polaroid (Be)', color: '#78350f' },
+    { id: 'arch-pink', name: 'Cổng Hoa (Hồng)', color: '#be185d' }
+  ];
 
-  // Countdown
+  switchTemplate(tplId: string): void {
+    this.selectedTemplate = tplId;
+  }
+
+  // Hero Slider
+  currentHeroSlide: number = 0;
+  heroSlides: string[] = [
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1600&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1600&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1600&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=85',
+    'https://images.unsplash.com/photo-1545232979-fbf6c63b2f8a?auto=format&fit=crop&w=1600&q=85'
+  ];
+  private heroSlideTimer: any;
+
+  // Scroll to top
+  showScrollTop: boolean = false;
+
+  // Quick Nav Menu Sheet
+  isQuickMenuOpen: boolean = false;
   countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
   private countdownInterval: any;
 
@@ -60,19 +97,19 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
   isLbFullscreen: boolean = false;
   private lbSlideshowTimer: any = null;
 
-  // 16 ảnh chất lượng cao chuẩn mẫu M-Invite
+  // 16 ảnh chất lượng cao chuẩn mẫu M-Invite (bố cục theo đúng ảnh tham khảo của người dùng)
   defaultPhotos: string[] = [
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85', // 1. Nhẫn cưới trên lụa trắng
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=85',  // 2. Hoa cưới cầm tay rực rỡ
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=800&q=85',  // 3. Đôi bàn tay đeo nhẫn cưới
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=85',  // 4. Cô dâu chú rể mỉm cười hạnh phúc
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=85',  // 5. Nắm tay nhau cùng váy cưới ren
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85', // 6. Bàn tiệc cưới ấm cúng lung linh
     'https://images.unsplash.com/photo-1545232979-fbf6c63b2f8a?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1509924603848-aca5e2f77337?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=85',
@@ -91,6 +128,12 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
     });
 
     this.route.queryParams.subscribe(params => {
+      if (params['demo'] === 'true') {
+        this.isDemoMode = true;
+      }
+      if (params['template']) {
+        this.selectedTemplate = params['template'];
+      }
       if (params['code']) {
         this.invitationCode = params['code'];
         this.loadInvitation(this.invitationCode);
@@ -112,10 +155,23 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
 
     this.loadWedding();
     this.loadWishes();
-    this.initPetals();
+
+    // Start auto slide
+    this.heroSlideTimer = setInterval(() => {
+      this.nextHeroSlide();
+    }, 4500);
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.initScrollReveal();
+    }, 300);
   }
 
   ngOnDestroy(): void {
+    if (this.scrollObserver) {
+      this.scrollObserver.disconnect();
+    }
     if (this.countdownInterval) clearInterval(this.countdownInterval);
     if (this.audioPlayer) {
       this.audioPlayer.pause();
@@ -123,6 +179,53 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
     if (this.lbSlideshowTimer) {
       clearInterval(this.lbSlideshowTimer);
     }
+    if (this.heroSlideTimer) {
+      clearInterval(this.heroSlideTimer);
+    }
+  }
+
+  openInvitation(): void {
+    this.isEnvelopeOpened = true;
+    if (!this.isPlayingMusic) {
+      this.toggleMusic();
+    }
+  }
+
+  nextHeroSlide(e?: Event): void {
+    if (e) e.stopPropagation();
+    this.currentHeroSlide = (this.currentHeroSlide + 1) % this.heroSlides.length;
+  }
+
+  prevHeroSlide(e?: Event): void {
+    if (e) e.stopPropagation();
+    this.currentHeroSlide = (this.currentHeroSlide - 1 + this.heroSlides.length) % this.heroSlides.length;
+  }
+
+  goToHeroSlide(index: number): void {
+    this.currentHeroSlide = index;
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    this.showScrollTop = window.scrollY > 400;
+  }
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  toggleQuickMenu(): void {
+    this.isQuickMenuOpen = !this.isQuickMenuOpen;
+  }
+
+  closeQuickMenu(): void {
+    this.isQuickMenuOpen = false;
+  }
+
+  addToCalendar(title: string, startTime: string, location: string): void {
+    const start = new Date(startTime).toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${start}/${start}&location=${encodeURIComponent(location)}`;
+    window.open(url, '_blank');
   }
 
   // Keyboard navigation for Lightbox
@@ -250,8 +353,14 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
   // ALBUM & LIGHTBOX ACTIONS
   // ==========================================
   get photoList(): string[] {
-    if (this.wedding?.photos && this.wedding.photos.length >= 6) {
-      return this.wedding.photos.map(p => p.photoUrl);
+    if (this.wedding?.photos && this.wedding.photos.length > 0) {
+      const apiUrls = this.wedding.photos.map(p => p.photoUrl);
+      const combined = [
+        ...this.defaultPhotos.slice(0, 6),
+        ...apiUrls.filter(u => !this.defaultPhotos.includes(u)),
+        ...this.defaultPhotos.slice(6)
+      ];
+      return Array.from(new Set(combined));
     }
     return this.defaultPhotos;
   }
@@ -357,25 +466,13 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
     window.requestAnimationFrame(step);
   }
 
-  private initScrollReveal(): void {
-    const elements = document.querySelectorAll('.m-slide-up');
-    const observer = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('revealed');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, {
-      root: null,
-      rootMargin: '0px 0px -40px 0px',
-      threshold: 0.1
-    });
-
-    elements.forEach(el => observer.observe(el));
-  }
-
   submitRsvp(): void {
+    if (this.isDemoMode) {
+      this.rsvpSubmitted = true;
+      this.rsvpMessage = 'Chế độ xem Demo: Phản hồi tham dự đã được mô phỏng thành công! (Chế độ xem thử, không chỉnh sửa cơ sở dữ liệu)';
+      return;
+    }
+
     const code = this.invitationCode || 'GUEST-DEFAULT';
     this.rsvpSubmitting = true;
 
@@ -403,6 +500,18 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
 
   submitWish(): void {
     if (!this.wishModel.senderName.trim() || !this.wishModel.message.trim()) return;
+
+    if (this.isDemoMode) {
+      this.wishes.unshift({
+        senderName: this.wishModel.senderName,
+        message: this.wishModel.message,
+        createdAt: new Date().toISOString()
+      });
+      this.wishModel.message = '';
+      this.wishSuccessMessage = 'Chế độ xem Demo: Lời chúc đã hiển thị mô phỏng thành công!';
+      setTimeout(() => this.wishSuccessMessage = '', 4000);
+      return;
+    }
 
     this.wishSubmitting = true;
     this.weddingService.postWish({
@@ -455,18 +564,39 @@ export class GuestInvitationComponent implements OnInit, OnDestroy {
     setTimeout(() => this.copiedText = '', 3000);
   }
 
-  private initPetals(): void {
-    const container = document.getElementById('petals-container');
-    if (!container) return;
-    for (let i = 0; i < 25; i++) {
-      const petal = document.createElement('div');
-      petal.className = 'petal';
-      petal.style.left = Math.random() * 100 + '%';
-      petal.style.animationDuration = (Math.random() * 5 + 6) + 's';
-      petal.style.animationDelay = (Math.random() * 5) + 's';
-      petal.style.opacity = (Math.random() * 0.6 + 0.3).toString();
-      container.appendChild(petal);
+  public initScrollReveal(): void {
+    if (typeof window === 'undefined') return;
+
+    if (this.scrollObserver) {
+      this.scrollObserver.disconnect();
     }
+
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal-on-scroll, .reveal-fade-up, .reveal-zoom, .reveal-slide-left, .reveal-slide-right, .reveal-stagger').forEach(el => {
+        el.classList.add('is-revealed');
+      });
+      return;
+    }
+
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '0px 0px -40px 0px',
+      threshold: 0.08
+    };
+
+    this.scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          this.scrollObserver?.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll(
+      '.reveal-on-scroll, .reveal-fade-up, .reveal-zoom, .reveal-slide-left, .reveal-slide-right, .reveal-stagger'
+    );
+    revealElements.forEach(el => this.scrollObserver?.observe(el));
   }
 
   private setDefaultSampleData(): void {

@@ -1,1 +1,40 @@
-/* You can add global styles to this file, and also import other style files */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #d4af37;
+  --rose: #e11d48;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-calligraphy: 'Ephesis', 'Caramel', 'Alex Brush', cursive;
+  --font-display: 'Bellota Text', 'Cinzel', serif;
+  --font-accent: 'Baloo Thambi 2', 'Playfair Display', serif;
+  --font-body: 'Lora', 'Inter', -apple-system, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #faf8f5;
+  color: #2b2523;
+  line-height: 1.6;
+}
+
+app-root {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}

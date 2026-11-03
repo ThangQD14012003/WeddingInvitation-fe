@@ -1,4 +1,10 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .admin-wrapper {
+  width: 100%;
   background-color: #0b0f19;
   color: #e5e7eb;
   min-height: 100vh;
@@ -120,9 +126,10 @@
 
 /* Container */
 .admin-container {
-  max-width: 1300px;
+  max-width: 1600px;
+  width: 100%;
   margin: 30px auto 0;
-  padding: 0 24px;
+  padding: 0 36px;
 }
 
 /* STATS */

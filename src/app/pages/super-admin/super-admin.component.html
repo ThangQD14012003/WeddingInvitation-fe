@@ -1,0 +1,318 @@
+<div class="sa-container">
+  <!-- TOP CONTROL HEADER -->
+  <header class="sa-header">
+    <div class="sa-header-left">
+      <div class="sa-brand-logo">
+        <i class="fa-solid fa-crown"></i>
+      </div>
+      <div>
+        <div class="sa-title-row">
+          <h1 class="sa-system-title">M-INVITE SAAS CONTROL TOWER</h1>
+          <span class="sa-role-badge">SUPER ADMIN PORTAL</span>
+        </div>
+        <p class="sa-system-sub">Quản trị toàn diện nền tảng thiệp mời điện tử, người thuê (tenants) và gói cước</p>
+      </div>
+    </div>
+
+    <div class="sa-header-actions">
+      <a routerLink="/" class="sa-btn-nav" title="Xem trang chủ và kho mẫu quảng cáo">
+        <i class="fa-solid fa-store"></i> <span>Trang Quảng Cáo</span>
+      </a>
+      <a routerLink="/admin" class="sa-btn-nav" title="Truy cập giao diện quản trị của cô dâu chú rể">
+        <i class="fa-solid fa-user-gear"></i> <span>Admin Cặp Đôi</span>
+      </a>
+      <button type="button" class="sa-btn-primary" (click)="openCreateModal()">
+        <i class="fa-solid fa-plus"></i> <span>Thêm Cặp Đôi Mới</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI METRICS ROW -->
+  <section class="sa-metrics-grid">
+    <div class="sa-metric-card">
+      <div class="metric-icon-box blue">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">TỔNG KHÁCH HÀNG</span>
+        <h3 class="metric-value">{{ totalTenantsCount }} <span class="metric-unit">cặp đôi</span></h3>
+        <span class="metric-sub text-success"><i class="fa-solid fa-arrow-up"></i> +100% so với tháng trước</span>
+      </div>
+    </div>
+
+    <div class="sa-metric-card">
+      <div class="metric-icon-box green">
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">THIỆP ĐANG HOẠT ĐỘNG</span>
+        <h3 class="metric-value">{{ activeTenantsCount }} <span class="metric-unit">đang online</span></h3>
+        <span class="metric-sub">{{ totalTenantsCount - activeTenantsCount }} thiệp đã hết hạn</span>
+      </div>
+    </div>
+
+    <div class="sa-metric-card">
+      <div class="metric-icon-box gold">
+        <i class="fa-solid fa-coins"></i>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">DOANH THU ƯỚC TÍNH</span>
+        <h3 class="metric-value">{{ totalRevenue | number }} <span class="metric-unit">VNĐ</span></h3>
+        <span class="metric-sub text-gold"><i class="fa-solid fa-gem"></i> Gói Standard & VIP chiếm 80%</span>
+      </div>
+    </div>
+
+    <div class="sa-metric-card">
+      <div class="metric-icon-box purple">
+        <i class="fa-solid fa-heart-pulse"></i>
+      </div>
+      <div class="metric-details">
+        <span class="metric-label">TƯƠNG TÁC KHÁCH MỜI</span>
+        <h3 class="metric-value">{{ totalWishesCount || 48 }} <span class="metric-unit">lời chúc</span></h3>
+        <span class="metric-sub text-purple"><i class="fa-solid fa-qrcode"></i> Hệ thống RSVP & VietQR ổn định</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN TENANTS MANAGEMENT PANEL -->
+  <main class="sa-main-panel">
+    <!-- PANEL TOP BAR: SEARCH & FILTERS -->
+    <div class="sa-panel-controls">
+      <div class="sa-search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" 
+               placeholder="Tìm kiếm theo Tên khách, Số điện thoại, Slug thiệp...">
+      </div>
+
+      <div class="sa-filters-wrap">
+        <div class="sa-filter-item">
+          <label><i class="fa-solid fa-box-archive"></i> Gói Cước:</label>
+          <select [(ngModel)]="selectedPackage" (change)="applyFilter()">
+            <option value="ALL">Tất cả gói</option>
+            <option value="Basic">Cơ Bản (Basic)</option>
+            <option value="Standard">Tiêu Chuẩn (Standard)</option>
+            <option value="VIP">VIP Hoàng Gia</option>
+          </select>
+        </div>
+
+        <div class="sa-filter-item">
+          <label><i class="fa-solid fa-signal"></i> Trạng Thái:</label>
+          <select [(ngModel)]="selectedStatus" (change)="applyFilter()">
+            <option value="ALL">Tất cả</option>
+            <option value="Active">Đang hoạt động</option>
+            <option value="Expired">Đã hết hạn</option>
+          </select>
+        </div>
+
+        <button type="button" class="sa-btn-refresh" (click)="loadData()" title="Làm mới dữ liệu">
+          <i class="fa-solid fa-rotate-right" [class.fa-spin]="loading"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="sa-table-responsive">
+      <table class="sa-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Khách Hàng (Người Thuê)</th>
+            <th>Cặp Đôi & Đám Cưới</th>
+            <th>Gói Dịch Vụ</th>
+            <th>Đường Dẫn Thiệp Mời</th>
+            <th>Thời Hạn & Trạng Thái</th>
+            <th class="text-right">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of filteredTenants" [class.row-expired]="t.status === 'Expired'">
+            <td class="cell-id">#{{ t.id }}</td>
+            
+            <!-- Khách hàng -->
+            <td>
+              <div class="client-info">
+                <span class="client-name">{{ t.fullName }}</span>
+                <span class="client-phone"><i class="fa-solid fa-phone"></i> {{ t.phone || 'Chưa cập nhật' }}</span>
+                <span class="client-email" *ngIf="t.email"><i class="fa-solid fa-envelope"></i> {{ t.email }}</span>
+              </div>
+            </td>
+
+            <!-- Cặp đôi -->
+            <td>
+              <div class="wedding-info" *ngIf="t.wedding">
+                <strong class="couple-names">{{ t.wedding.groomName }} & {{ t.wedding.brideName }}</strong>
+                <span class="wedding-venue" [title]="t.wedding.venue">
+                  <i class="fa-solid fa-location-dot"></i> {{ t.wedding.venue }}
+                </span>
+                <span class="tpl-chip">Mẫu: {{ t.wedding.templateType }}</span>
+              </div>
+              <div *ngIf="!t.wedding" class="text-muted">Chưa cấu hình thiệp</div>
+            </td>
+
+            <!-- Gói dịch vụ -->
+            <td>
+              <span class="pkg-badge" [ngClass]="t.packageType.toLowerCase()">
+                <i class="fa-solid fa-gem" *ngIf="t.packageType === 'VIP'"></i>
+                <i class="fa-solid fa-star" *ngIf="t.packageType === 'Standard'"></i>
+                <i class="fa-solid fa-circle" *ngIf="t.packageType === 'Basic'"></i>
+                {{ t.packageType }}
+              </span>
+            </td>
+
+            <!-- Đường dẫn thiệp -->
+            <td>
+              <div class="slug-info" *ngIf="t.wedding?.customSlug">
+                <a [routerLink]="['/invite', t.wedding?.customSlug]" target="_blank" class="slug-link">
+                  /invite/{{ t.wedding?.customSlug }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                <button type="button" class="btn-slug-copy" (click)="copyLink(t.wedding?.customSlug)" title="Sao chép link thiệp">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+            </td>
+
+            <!-- Thời hạn & trạng thái -->
+            <td>
+              <div class="expire-info">
+                <span class="status-pill" [class.active]="t.status === 'Active'" [class.expired]="t.status === 'Expired'">
+                  {{ t.status === 'Active' ? 'Hoạt động' : 'Hết hạn' }}
+                </span>
+                <span class="expire-date">
+                  Hạn: {{ t.expireDate | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Thao tác -->
+            <td class="text-right">
+              <div class="action-buttons-group">
+                <a [routerLink]="['/invite', t.wedding?.customSlug || 'thang-lan']" target="_blank" 
+                   class="btn-act btn-act-view" title="Mở trang thiệp khách mời">
+                  <i class="fa-solid fa-eye"></i>
+                </a>
+
+                <button type="button" class="btn-act btn-act-excel" 
+                        (click)="exportExcel(t.wedding?.customSlug)" title="Xuất file Excel danh sách mừng cưới & RSVP">
+                  <i class="fa-solid fa-file-excel"></i>
+                </button>
+
+                <button type="button" class="btn-act btn-act-delete" 
+                        (click)="deleteTenant(t.id, t.fullName)" title="Xóa khách thuê này">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="filteredTenants.length === 0">
+            <td colspan="7" class="empty-table-cell">
+              <div class="empty-state">
+                <i class="fa-solid fa-folder-open"></i>
+                <p>Không tìm thấy khách thuê hoặc cặp đôi nào phù hợp với bộ lọc</p>
+                <button type="button" class="sa-btn-primary" (click)="openCreateModal()">
+                  <i class="fa-solid fa-plus"></i> Tạo Mới Ngay
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- MODAL: THÊM CẶP ĐÔI / KHÁCH THUÊ MỚI -->
+  <div class="sa-modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+    <div class="sa-modal-card" (click)="$event.stopPropagation()">
+      <div class="sa-modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-user-plus"></i>
+          <div>
+            <h3>Tạo Cặp Đôi & Kích Hoạt Thiệp Mới</h3>
+            <p>Hệ thống sẽ tự động khởi tạo Tenant, Wedding Link và Dashboard quản trị</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form (submit)="submitCreate(); $event.preventDefault()" class="sa-modal-form">
+        <div class="form-section-title">1. Thông tin khách thuê (Người liên hệ)</div>
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label>Họ và tên đại diện <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="createForm.fullName" name="fullName" placeholder="VD: Trần Quang Thắng" required>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại / Zalo <span class="req">*</span></label>
+            <input type="tel" [(ngModel)]="createForm.phone" name="phone" placeholder="VD: 0988776655" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email liên hệ</label>
+          <input type="email" [(ngModel)]="createForm.email" name="email" placeholder="VD: thang.tran@gmail.com">
+        </div>
+
+        <div class="form-section-title">2. Thông tin hôn lễ & Đường dẫn thiệp</div>
+        <div class="grid-2-col">
+          <div class="form-group">
+            <label>Tên Chú Rể <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="createForm.groomName" (input)="generateSlug()" name="groomName" placeholder="VD: Quang Thắng" required>
+          </div>
+          <div class="form-group">
+            <label>Tên Cô Dâu <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="createForm.brideName" (input)="generateSlug()" name="brideName" placeholder="VD: Ngọc Lan" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Đường dẫn tùy biến (Slug) <span class="req">*</span></label>
+          <div class="slug-input-addon">
+            <span>/invite/</span>
+            <input type="text" [(ngModel)]="createForm.slug" name="slug" placeholder="thang-lan" required>
+          </div>
+          <small class="hint-text">Link xem thiệp sẽ là: <strong>{{ apiUrl ? '' : '' }}http://localhost:4200/invite/{{ createForm.slug || 'slug-mau' }}</strong></small>
+        </div>
+
+        <div class="form-section-title">3. Gói dịch vụ & Giao diện</div>
+        <div class="grid-3-col">
+          <div class="form-group">
+            <label>Gói dịch vụ</label>
+            <select [(ngModel)]="createForm.packageType" name="packageType">
+              <option value="Basic">Basic (199.000đ - 1 tháng)</option>
+              <option value="Standard">Standard (399.000đ - 6 tháng)</option>
+              <option value="VIP">VIP Hoàng Gia (599.000đ - 1 năm)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Thời hạn sử dụng</label>
+            <select [(ngModel)]="createForm.monthsDuration" name="monthsDuration">
+              <option [value]="1">1 Tháng</option>
+              <option [value]="3">3 Tháng</option>
+              <option [value]="6">6 Tháng</option>
+              <option [value]="12">12 Tháng (1 Năm)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mẫu thiệp ban đầu</label>
+            <select [(ngModel)]="createForm.templateType" name="templateType">
+              <option value="lotus-red">Lotus Red Luxury</option>
+              <option value="champagne">Champagne Rose</option>
+              <option value="rustic">Rustic Garden</option>
+              <option value="minimalist">Minimalist Modern</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sa-modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeModal()">Hủy Bỏ</button>
+          <button type="submit" class="btn-confirm" [disabled]="creating">
+            <i class="fa-solid fa-check" *ngIf="!creating"></i>
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="creating"></i>
+            <span>{{ creating ? 'Đang khởi tạo...' : 'Kích Hoạt Thiệp Ngay' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

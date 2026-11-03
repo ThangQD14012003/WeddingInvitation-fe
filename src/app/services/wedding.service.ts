@@ -147,4 +147,19 @@ export class WeddingService {
   deleteWish(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}/admin/wishes/${id}`);
   }
+
+  // ==========================================
+  // SUPER ADMIN API (QUẢN TRỊ NỀN TẢNG SAAS)
+  // ==========================================
+  getTenants(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/admin/tenants`);
+  }
+
+  createTenant(data: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/admin/tenants`, data);
+  }
+
+  deleteTenant(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/admin/tenants/${id}`);
+  }
 }
